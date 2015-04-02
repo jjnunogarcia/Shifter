@@ -32,76 +32,54 @@ import java.util.Locale;
  * @author jjnunogarcia@gmail.com
  */
 public class SimpleMonthView extends View {
-    public static final String TAG                              = SimpleMonthView.class.getSimpleName();
-    public static final String VIEW_PARAMS_HEIGHT               = "height";
-    public static final String VIEW_PARAMS_MONTH                = "month";
-    public static final String VIEW_PARAMS_YEAR                 = "year";
-    public static final String VIEW_PARAMS_SELECTED_BEGIN_DAY   = "selected_begin_day";
-    public static final String VIEW_PARAMS_SELECTED_LAST_DAY    = "selected_last_day";
-    public static final String VIEW_PARAMS_SELECTED_BEGIN_MONTH = "selected_begin_month";
-    public static final String VIEW_PARAMS_SELECTED_LAST_MONTH  = "selected_last_month";
-    public static final String VIEW_PARAMS_SELECTED_BEGIN_YEAR  = "selected_begin_year";
-    public static final String VIEW_PARAMS_SELECTED_LAST_YEAR   = "selected_last_year";
-    public static final String VIEW_PARAMS_WEEK_START           = "week_start";
+    public static final String TAG                    = SimpleMonthView.class.getSimpleName();
+    public static final String VIEW_PARAMS_MONTH      = "month";
+    public static final String VIEW_PARAMS_YEAR       = "year";
+    public static final String VIEW_PARAMS_WEEK_START = "week_start";
 
-    private static final   int SELECTED_CIRCLE_ALPHA = 128;
-    protected static final int DEFAULT_HEIGHT        = 32;
-    protected static final int DEFAULT_NUM_ROWS      = 6;
+    protected static final int DEFAULT_HEIGHT   = 32;
+    protected static final int DEFAULT_NUM_ROWS = 6;
     protected static int DAY_SELECTED_CIRCLE_SIZE;
-    protected static int DAY_SEPARATOR_WIDTH = 1;
     protected static int MINI_DAY_NUMBER_TEXT_SIZE;
     protected static int MIN_HEIGHT = 10;
     protected static int MONTH_DAY_LABEL_TEXT_SIZE;
     protected static int MONTH_HEADER_SIZE;
     protected static int MONTH_LABEL_TEXT_SIZE;
 
-    protected int padding = 0;
+    private   String dayOfWeekTypeface;
+    private   String monthTitleTypeface;
+    protected Paint  weekDayNamePaint;
+    protected Paint  monthNumPaint;
+    protected Paint  monthNamePaint;
+    protected Paint  dayCirclePaint;
+    protected int    monthTextColor;
+    protected int    dayTextColor;
+    protected int    monthTitleBGColor;
+    protected int    selectedDaysColor;
 
-    private String dayOfWeekTypeface;
-    private String monthTitleTypeface;
+    protected int               today             = -1;
+    protected int               padding           = 0;
+    protected int               weekStart         = 1;
+    protected int               daysPerWeek       = 7;
+    protected int               numCells          = daysPerWeek;
+    private   int               dayOfWeekStart    = 0;
+    private   DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
 
-    protected Paint monthDayLabelPaint;
-    protected Paint monthNumPaint;
-    protected Paint monthTitleBGPaint;
-    protected Paint monthTitlePaint;
-    protected Paint dayCirclePaint;
-    protected int   monthTextColor;
-    protected int   dayTextColor;
-    protected int   monthTitleBGColor;
-    protected int   selectedDaysColor;
-
-    protected boolean hasToday           = false;
-    protected boolean isPrev             = false;
-    protected int     selectedBeginDay   = -1;
-    protected int     selectedLastDay    = -1;
-    protected int     selectedBeginMonth = -1;
-    protected int     selectedLastMonth  = -1;
-    protected int     selectedBeginYear  = -1;
-    protected int     selectedLastYear   = -1;
-    protected int     today              = -1;
-    protected int     weekStart          = 1;
-    protected int     daysPerWeek        = 7;
-    protected int     numCells           = daysPerWeek;
-    private   int     dayOfWeekStart     = 0;
-    protected int month;
     protected int rowHeight = DEFAULT_HEIGHT;
-    protected       int  width;
-    protected       int  year;
-    protected final Time todayTime;
+    private   int numRows   = DEFAULT_NUM_ROWS;
+    protected       int      month;
+    protected       int      width;
+    protected       int      year;
+    protected final Time     todayTime;
+    private final   Calendar calendar;
+    private final   Calendar weekDayNameCalendar;
 
-    private final Calendar calendar;
-    private final Calendar dayLabelCalendar;
-    private final Boolean  isPrevDayEnabled;
-
-    private int numRows = DEFAULT_NUM_ROWS;
-
-    private DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
 
     public SimpleMonthView(Context context, TypedArray typedArray) {
         super(context);
 
         Resources resources = context.getResources();
-        dayLabelCalendar = Calendar.getInstance();
+        weekDayNameCalendar = Calendar.getInstance();
         calendar = Calendar.getInstance();
         todayTime = new Time(Time.getCurrentTimezone());
         todayTime.setToNow();
@@ -120,36 +98,27 @@ public class SimpleMonthView extends View {
 
         rowHeight = (typedArray.getDimensionPixelSize(R.styleable.DayPickerView_calendarHeight, resources.getDimensionPixelOffset(R.dimen.calendar_height)) - MONTH_HEADER_SIZE) / 6;
 
-        isPrevDayEnabled = typedArray.getBoolean(R.styleable.DayPickerView_enablePreviousDay, true);
-
         initView();
     }
 
     private void initView() {
-        monthTitlePaint = new Paint();
-        monthTitlePaint.setFakeBoldText(true);
-        monthTitlePaint.setAntiAlias(true);
-        monthTitlePaint.setTextSize(MONTH_LABEL_TEXT_SIZE);
-        monthTitlePaint.setTypeface(Typeface.create(monthTitleTypeface, Typeface.BOLD));
-        monthTitlePaint.setColor(monthTextColor);
-        monthTitlePaint.setTextAlign(Align.CENTER);
-        monthTitlePaint.setStyle(Style.FILL);
+        monthNamePaint = new Paint();
+        monthNamePaint.setFakeBoldText(true);
+        monthNamePaint.setAntiAlias(true);
+        monthNamePaint.setTextSize(MONTH_LABEL_TEXT_SIZE);
+        monthNamePaint.setTypeface(Typeface.create(monthTitleTypeface, Typeface.BOLD));
+        monthNamePaint.setColor(monthTextColor);
+        monthNamePaint.setTextAlign(Align.CENTER);
+        monthNamePaint.setStyle(Style.FILL);
 
-        monthTitleBGPaint = new Paint();
-        monthTitleBGPaint.setFakeBoldText(true);
-        monthTitleBGPaint.setAntiAlias(true);
-        monthTitleBGPaint.setColor(monthTitleBGColor);
-        monthTitleBGPaint.setTextAlign(Align.CENTER);
-        monthTitleBGPaint.setStyle(Style.FILL);
-
-        monthDayLabelPaint = new Paint();
-        monthDayLabelPaint.setAntiAlias(true);
-        monthDayLabelPaint.setTextSize(MONTH_DAY_LABEL_TEXT_SIZE);
-        monthDayLabelPaint.setColor(dayTextColor);
-        monthDayLabelPaint.setTypeface(Typeface.create(dayOfWeekTypeface, Typeface.NORMAL));
-        monthDayLabelPaint.setStyle(Style.FILL);
-        monthDayLabelPaint.setTextAlign(Align.CENTER);
-        monthDayLabelPaint.setFakeBoldText(true);
+        weekDayNamePaint = new Paint();
+        weekDayNamePaint.setAntiAlias(true);
+        weekDayNamePaint.setTextSize(MONTH_DAY_LABEL_TEXT_SIZE);
+        weekDayNamePaint.setColor(dayTextColor);
+        weekDayNamePaint.setTypeface(Typeface.create(dayOfWeekTypeface, Typeface.NORMAL));
+        weekDayNamePaint.setStyle(Style.FILL);
+        weekDayNamePaint.setTextAlign(Align.CENTER);
+        weekDayNamePaint.setFakeBoldText(true);
 
         dayCirclePaint = new Paint();
         dayCirclePaint.setAntiAlias(true);
@@ -161,106 +130,6 @@ public class SimpleMonthView extends View {
         monthNumPaint.setTextSize(MINI_DAY_NUMBER_TEXT_SIZE);
         monthNumPaint.setStyle(Style.FILL);
         monthNumPaint.setTextAlign(Align.CENTER);
-        monthNumPaint.setFakeBoldText(false);
-    }
-
-    private int calculateNumRows() {
-        int offset = findDayOffset();
-        int dividend = (offset + numCells) / daysPerWeek;
-        int remainder = (offset + numCells) % daysPerWeek;
-        return dividend + (remainder > 0 ? 1 : 0);
-    }
-
-    private void drawMonthDayLabels(Canvas canvas) {
-        int y = MONTH_HEADER_SIZE - (MONTH_DAY_LABEL_TEXT_SIZE >> 1);
-        int dayWidthHalf = (width - padding * 2) / (daysPerWeek * 2);
-
-        for (int i = 0; i < daysPerWeek; i++) {
-            int calendarDay = (i + weekStart) % daysPerWeek;
-            int x = (2 * i + 1) * dayWidthHalf + padding;
-            dayLabelCalendar.set(Calendar.DAY_OF_WEEK, calendarDay);
-            canvas.drawText(dateFormatSymbols.getShortWeekdays()[dayLabelCalendar.get(Calendar.DAY_OF_WEEK)].toUpperCase(Locale.getDefault()), x, y, monthDayLabelPaint);
-        }
-    }
-
-    private void drawMonthTitle(Canvas canvas) {
-        int x = (width + 2 * padding) / 2;
-        int y = ((MONTH_HEADER_SIZE - MONTH_DAY_LABEL_TEXT_SIZE) >> 1) + (MONTH_LABEL_TEXT_SIZE / 3);
-        StringBuilder stringBuilder = new StringBuilder(getMonthAndYearString().toLowerCase());
-        stringBuilder.setCharAt(0, Character.toUpperCase(stringBuilder.charAt(0)));
-        canvas.drawText(stringBuilder.toString(), x, y, monthTitlePaint);
-    }
-
-    private int findDayOffset() {
-        return (dayOfWeekStart < weekStart ? (dayOfWeekStart + daysPerWeek) : dayOfWeekStart) - weekStart;
-    }
-
-    private String getMonthAndYearString() {
-        long millis = calendar.getTimeInMillis();
-        int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NO_MONTH_DAY;
-        return DateUtils.formatDateRange(getContext(), millis, millis, flags);
-    }
-
-    private void onDayClick(CalendarDay calendarDay) {
-        if (isPrevDayEnabled || !((calendarDay.getMonth() == todayTime.month) && (calendarDay.getYear() == todayTime.year) && calendarDay.getDay() < todayTime.monthDay)) {
-            if (calendarDay != null) {
-                EventBus.getDefault().post(new OnDayClickEvent(calendarDay.getDay(), calendarDay.getMonth(), calendarDay.getYear()));
-            }
-        }
-    }
-
-    private boolean sameDay(int monthDay, Time time) {
-        return (year == time.year) && (month == time.month) && (monthDay == time.monthDay);
-    }
-
-    private boolean prevDay(int monthDay, Time time) {
-        return ((year < time.year)) || (year == time.year && month < time.month) || (month == time.month && monthDay < time.monthDay);
-    }
-
-    protected void drawMonthNums(Canvas canvas) {
-        int y = (rowHeight + MINI_DAY_NUMBER_TEXT_SIZE) / 2 - DAY_SEPARATOR_WIDTH + MONTH_HEADER_SIZE;
-        int paddingDay = (width - 2 * padding) / (2 * daysPerWeek);
-        int dayOffset = findDayOffset();
-        int day = 1;
-
-        while (day <= numCells) {
-            int x = paddingDay * (1 + dayOffset * 2) + padding;
-
-//            DayView dayView = new DayView(getContext());
-//            dayView.setText(String.valueOf(day));
-//            dayView.draw(canvas);
-            canvas.drawCircle(x, y, 40, dayCirclePaint);
-            canvas.drawText(String.format("%d", day), x, y, monthNumPaint);
-
-            dayOffset++;
-            if (dayOffset == daysPerWeek) {
-                dayOffset = 0;
-                y += rowHeight;
-            }
-            day++;
-        }
-    }
-
-    public CalendarDay getDayFromLocation(float x, float y) {
-        if ((x < padding) || (x > width - padding)) {
-            return null;
-        }
-
-        int yDay = (int) (y - MONTH_HEADER_SIZE) / rowHeight;
-        int day = 1 + ((int) ((x - padding) * daysPerWeek / (width - padding - padding)) - findDayOffset()) + yDay * daysPerWeek;
-
-        if (month > 11 || month < 0 || CalendarUtils.getDaysInMonth(month, year) < day || day < 1) {
-            return null;
-        }
-
-        return new CalendarDay(year, month, day);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        drawMonthTitle(canvas);
-        drawMonthDayLabels(canvas);
-        drawMonthNums(canvas);
     }
 
     @Override
@@ -274,6 +143,61 @@ public class SimpleMonthView extends View {
     }
 
     @Override
+    protected void onDraw(Canvas canvas) {
+        drawMonthName(canvas);
+        drawWeekDayName(canvas);
+        drawMonthNums(canvas);
+    }
+
+    private void drawMonthName(Canvas canvas) {
+        int x = (width + 2 * padding) / 2;
+        int y = ((MONTH_HEADER_SIZE - MONTH_DAY_LABEL_TEXT_SIZE) >> 1) + (MONTH_LABEL_TEXT_SIZE / 3);
+        StringBuilder stringBuilder = new StringBuilder(getMonthAndYearString().toLowerCase());
+        stringBuilder.setCharAt(0, Character.toUpperCase(stringBuilder.charAt(0)));
+        canvas.drawText(stringBuilder.toString(), x, y, monthNamePaint);
+    }
+
+    private void drawWeekDayName(Canvas canvas) {
+        int y = MONTH_HEADER_SIZE - (MONTH_DAY_LABEL_TEXT_SIZE >> 1);
+        int dayWidthHalf = (width - 2 * padding) / (2 * daysPerWeek);
+
+        for (int i = 0; i < daysPerWeek; i++) {
+            int calendarDay = (i + weekStart) % daysPerWeek;
+            int x = (2 * i + 1) * dayWidthHalf + padding;
+            weekDayNameCalendar.set(Calendar.DAY_OF_WEEK, calendarDay);
+            canvas.drawText(dateFormatSymbols.getShortWeekdays()[weekDayNameCalendar.get(Calendar.DAY_OF_WEEK)].toUpperCase(Locale.getDefault()), x, y, weekDayNamePaint);
+        }
+    }
+
+    private void drawMonthNums(Canvas canvas) {
+        int textY = (rowHeight + MINI_DAY_NUMBER_TEXT_SIZE) / 2 + MONTH_HEADER_SIZE;
+        int circleY = rowHeight / 2 + MONTH_HEADER_SIZE;
+        int dayWidthHalf = (width - 2 * padding) / (2 * daysPerWeek);
+        int dayOffset = findDayOffset();
+
+        for (int day = 1; day < numCells; day++) {
+            int x = dayWidthHalf * (1 + dayOffset * 2) + padding;
+
+//            DayView dayView = new DayView(getContext());
+//            dayView.setText(String.valueOf(day));
+//            dayView.draw(canvas);
+            canvas.drawCircle(x, circleY, 50, dayCirclePaint);
+            canvas.drawText(String.format("%d", day), x, textY, monthNumPaint);
+
+            dayOffset++;
+            if (dayOffset == daysPerWeek) {
+                dayOffset = 0;
+                textY += rowHeight;
+                circleY += rowHeight;
+            }
+        }
+    }
+
+    private int findDayOffset() {
+        return (dayOfWeekStart < weekStart ? dayOfWeekStart + daysPerWeek : dayOfWeekStart) - weekStart;
+    }
+
+    @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
             CalendarDay calendarDay = getDayFromLocation(event.getX(), event.getY());
@@ -282,6 +206,37 @@ public class SimpleMonthView extends View {
             }
         }
         return true;
+    }
+
+    private String getMonthAndYearString() {
+        long millis = calendar.getTimeInMillis();
+        int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NO_MONTH_DAY;
+        return DateUtils.formatDateRange(getContext(), millis, millis, flags);
+    }
+
+    private void onDayClick(CalendarDay calendarDay) {
+        if (calendarDay != null) {
+            EventBus.getDefault().post(new OnDayClickEvent(calendarDay.getDay(), calendarDay.getMonth(), calendarDay.getYear()));
+        }
+    }
+
+    private boolean sameDay(int monthDay, Time time) {
+        return (year == time.year) && (month == time.month) && (monthDay == time.monthDay);
+    }
+
+    public CalendarDay getDayFromLocation(float x, float y) {
+        if ((x <= padding) || (x >= width - 2 * padding)) {
+            return null;
+        }
+
+        int row = (int) (y - MONTH_HEADER_SIZE) / rowHeight;
+        int day = 1 + ((int) ((x - padding) * daysPerWeek / (width - 2 * padding)) - findDayOffset()) + row * daysPerWeek;
+
+        if (month > 11 || month < 0 || CalendarUtils.getDaysInMonth(month, year) < day || day < 1) {
+            return null;
+        }
+
+        return new CalendarDay(year, month, day);
     }
 
     public void reuse() {
@@ -295,35 +250,9 @@ public class SimpleMonthView extends View {
         }
         setTag(params);
 
-        if (params.containsKey(VIEW_PARAMS_HEIGHT)) {
-            rowHeight = params.get(VIEW_PARAMS_HEIGHT);
-            if (rowHeight < MIN_HEIGHT) {
-                rowHeight = MIN_HEIGHT;
-            }
-        }
-        if (params.containsKey(VIEW_PARAMS_SELECTED_BEGIN_DAY)) {
-            selectedBeginDay = params.get(VIEW_PARAMS_SELECTED_BEGIN_DAY);
-        }
-        if (params.containsKey(VIEW_PARAMS_SELECTED_LAST_DAY)) {
-            selectedLastDay = params.get(VIEW_PARAMS_SELECTED_LAST_DAY);
-        }
-        if (params.containsKey(VIEW_PARAMS_SELECTED_BEGIN_MONTH)) {
-            selectedBeginMonth = params.get(VIEW_PARAMS_SELECTED_BEGIN_MONTH);
-        }
-        if (params.containsKey(VIEW_PARAMS_SELECTED_LAST_MONTH)) {
-            selectedLastMonth = params.get(VIEW_PARAMS_SELECTED_LAST_MONTH);
-        }
-        if (params.containsKey(VIEW_PARAMS_SELECTED_BEGIN_YEAR)) {
-            selectedBeginYear = params.get(VIEW_PARAMS_SELECTED_BEGIN_YEAR);
-        }
-        if (params.containsKey(VIEW_PARAMS_SELECTED_LAST_YEAR)) {
-            selectedLastYear = params.get(VIEW_PARAMS_SELECTED_LAST_YEAR);
-        }
-
         month = params.get(VIEW_PARAMS_MONTH);
         year = params.get(VIEW_PARAMS_YEAR);
 
-        hasToday = false;
         today = -1;
 
         calendar.set(Calendar.MONTH, month);
@@ -341,13 +270,20 @@ public class SimpleMonthView extends View {
         for (int i = 0; i < numCells; i++) {
             int day = i + 1;
             if (sameDay(day, todayTime)) {
-                hasToday = true;
                 today = day;
             }
 
-            isPrev = prevDay(day, todayTime);
         }
 
         numRows = calculateNumRows();
+
+        invalidate();
+    }
+
+    private int calculateNumRows() {
+        int offset = findDayOffset();
+        int dividend = (offset + numCells) / daysPerWeek;
+        int remainder = (offset + numCells) % daysPerWeek;
+        return dividend + (remainder > 0 ? 1 : 0);
     }
 }
