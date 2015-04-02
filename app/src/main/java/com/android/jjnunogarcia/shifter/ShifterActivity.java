@@ -1,39 +1,52 @@
 package com.android.jjnunogarcia.shifter;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import com.android.jjnunogarcia.shifter.eventbus.OnDayClickEvent;
+import com.android.jjnunogarcia.shifter.views.DayPickerView;
+import de.greenrobot.event.EventBus;
 
+/**
+ * User: jesus
+ * Date: 24/03/15
+ *
+ * @author jjnunogarcia@gmail.com
+ */
+public class ShifterActivity extends ActionBarActivity implements DatePickerController {
+    public static final String TAG = ShifterActivity.class.getSimpleName();
 
-public class ShifterActivity extends ActionBarActivity {
+    @InjectView(R.id.activity_shifter_picker_view) DayPickerView dayPickerView;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_shifter);
-  }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_shifter);
+        ButterKnife.inject(this);
 
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_shifter, menu);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
-
-    //noinspection SimplifiableIfStatement
-    if (id == R.id.action_settings) {
-      return true;
+        dayPickerView.setController(this);
     }
 
-    return super.onOptionsItemSelected(item);
-  }
+    @Override
+    public int getMaxYear() {
+        return 2018;
+    }
+
+    public void onEvent(OnDayClickEvent onDayClickEvent) {
+        Log.e("Day Selected", onDayClickEvent.getDay() + "/" + onDayClickEvent.getMonth() + "/" + onDayClickEvent.getYear());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.getDefault().registerSticky(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
 }

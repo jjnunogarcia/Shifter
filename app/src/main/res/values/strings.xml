@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Shifter</string>
-
-    <string name="hello_world">Hello world!</string>
+    <string name="sans_serif" translatable="false">sans-serif</string>
     <string name="action_settings">Settings</string>
 </resources>
