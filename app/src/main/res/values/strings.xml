@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Shifter</string>
     <string name="sans_serif" translatable="false">sans-serif</string>
-    <string name="action_settings">Settings</string>
+    <string name="activity_shifter_action_show_shifts">Show shifts</string>
+    <string name="activity_day_detail_label">Day Detail</string>
+    <string name="activity_day_detail_action_add_shift">Add new shift</string>
+    <string name="activity_shifts_action_create_shift">Create shift</string>
+    <string name="activity_shifts_label">Shifts</string>
 </resources>

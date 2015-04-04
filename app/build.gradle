@@ -1,4 +1,25 @@
+apply plugin: 'android-sdk-manager' // Downloads sdk automatically, no more SDK manager needed
 apply plugin: 'com.android.application'
+apply plugin: 'org.robolectric'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.1.0'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+        classpath 'org.robolectric:robolectric-gradle-plugin:1.0.1'
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repo.commonsware.com.s3.amazonaws.com"
+    }
+}
 
 android {
     compileSdkVersion 21
@@ -10,12 +31,86 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+//    signingConfigs {
+//        release {
+//            storeFile file('klara-android.keystore')
+//            storePassword '$pd*Q%06Wy4n'
+//            keyAlias 'goderma_android'
+//            keyPassword '$pd*Q%06Wy4n'
+//        }
+//    }
+
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            minifyEnabled false
+            debuggable true
+        }
+
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFile 'proguard-rules.txt'
+//            signingConfig signingConfigs.release
+            zipAlignEnabled true
+            debuggable false
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            if (variant.name == "release") {
+                output.outputFile = new File(output.outputFile.parent, "shifter-RC-${variant.versionName}-RELEASE.apk")
+            } else {
+                output.outputFile = new File(output.outputFile.parent, "shifter-RC-${variant.versionName}-DEBUG.apk")
+            }
+        }
+    }
+}
+
+robolectric {
+    // Configure includes / excludes
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
+
+    // Configure max heap size of the test JVM
+    maxHeapSize = '2048m'
+
+    // Configure the test JVM arguments - Does not apply to Java 8
+    jvmArgs '-XX:MaxPermSize=512m', '-XX:-UseSplitVerifier'
+
+    // Specify max number of processes (default is 1)
+    maxParallelForks = 4
+
+    // Specify max number of test classes to execute in a test process
+    // before restarting the process (default is unlimited)
+    forkEvery = 150
+
+    // configure whether failing tests should fail the build
+    ignoreFailures true
+
+    // use afterTest to listen to the test execution results
+    afterTest { descriptor, result ->
+        println "Executing test for ${descriptor.name} with result: ${result.resultType}"
     }
 }
 

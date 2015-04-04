@@ -15,7 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import com.android.jjnunogarcia.shifter.R;
 import com.android.jjnunogarcia.shifter.eventbus.OnDayClickEvent;
-import com.android.jjnunogarcia.shifter.helpers.CalendarUtils;
+import com.android.jjnunogarcia.shifter.helpers.Utils;
 import com.android.jjnunogarcia.shifter.model.CalendarDay;
 import de.greenrobot.event.EventBus;
 
@@ -232,7 +232,7 @@ public class SimpleMonthView extends View {
         int row = (int) (y - MONTH_HEADER_SIZE) / rowHeight;
         int day = 1 + ((int) ((x - padding) * daysPerWeek / (width - 2 * padding)) - findDayOffset()) + row * daysPerWeek;
 
-        if (month > 11 || month < 0 || CalendarUtils.getDaysInMonth(month, year) < day || day < 1) {
+        if (month > 11 || month < 0 || Utils.getDaysInMonth(month, year) < day || day < 1) {
             return null;
         }
 
@@ -266,7 +266,7 @@ public class SimpleMonthView extends View {
             weekStart = calendar.getFirstDayOfWeek();
         }
 
-        numCells = CalendarUtils.getDaysInMonth(month, year);
+        numCells = Utils.getDaysInMonth(month, year);
         for (int i = 0; i < numCells; i++) {
             int day = i + 1;
             if (sameDay(day, todayTime)) {
