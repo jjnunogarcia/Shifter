@@ -68,13 +68,13 @@ public class DayDetailShiftsAdapter extends BaseAdapter {
         }
 
         Shift shift = shifts.get(position);
-        shiftViewHolder.id.setText(shift.getId());
+        shiftViewHolder.id.setText(String.valueOf(shift.getId()));
         shiftViewHolder.name.setText(shift.getName());
         shiftViewHolder.description.setText(shift.getDescription());
-        shiftViewHolder.start.setText(shift.getStart());
-        shiftViewHolder.duration.setText(shift.getDuration());
+        shiftViewHolder.start.setText(String.valueOf(shift.getStart()));
+        shiftViewHolder.duration.setText(String.valueOf(shift.getDuration()));
         shiftViewHolder.location.setText(shift.getLocation());
-        shiftViewHolder.color.setText(shift.getColor());
+        shiftViewHolder.color.setText(String.valueOf(shift.getColor()));
 
         return view;
     }

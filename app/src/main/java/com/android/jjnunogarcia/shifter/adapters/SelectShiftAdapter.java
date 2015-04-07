@@ -75,9 +75,9 @@ public class SelectShiftAdapter extends BaseAdapter implements CompoundButton.On
         selectShiftViewHolder.checkBox.setTag(shift);
 
         if (daySchedule.getShifts().contains(shift)) {
-            selectShiftViewHolder.checkBox.setSelected(true);
+            selectShiftViewHolder.checkBox.setChecked(true);
         } else {
-            selectShiftViewHolder.checkBox.setSelected(false);
+            selectShiftViewHolder.checkBox.setChecked(false);
         }
 
         selectShiftViewHolder.id.setText(String.valueOf(shift.getId()));

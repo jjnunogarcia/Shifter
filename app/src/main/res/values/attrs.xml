@@ -5,7 +5,7 @@
         <attr name="circleText" format="string" />
     </declare-styleable>
 
-    <declare-styleable name="DayPickerView">
+    <declare-styleable name="CalendarView">
         <attr name="colorCurrentDay" format="color" />
         <attr name="colorSelectedDayBackground" format="color" />
         <attr name="colorSelectedDayText" format="color" />

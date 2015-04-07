@@ -14,15 +14,16 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import com.android.jjnunogarcia.shifter.DatePickerController;
 import com.android.jjnunogarcia.shifter.R;
+import com.android.jjnunogarcia.shifter.adapters.CalendarViewAdapter;
 import com.android.jjnunogarcia.shifter.database.DBConstants;
 import com.android.jjnunogarcia.shifter.database.ShifterProvider;
 import com.android.jjnunogarcia.shifter.eventbus.OnDayClickEvent;
 import com.android.jjnunogarcia.shifter.helpers.Utils;
 import com.android.jjnunogarcia.shifter.model.DaySchedule;
-import com.android.jjnunogarcia.shifter.views.DayPickerView;
+import com.android.jjnunogarcia.shifter.views.CalendarView;
 import de.greenrobot.event.EventBus;
 
-import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 /**
@@ -35,8 +36,10 @@ public class ShifterActivity extends ActionBarActivity implements DatePickerCont
     public static final String TAG                     = ShifterActivity.class.getSimpleName();
     public static final int    DAY_SCHEDULES_LOADER_ID = 0;
 
-    @InjectView(R.id.activity_shifter_picker_view) DayPickerView             dayPickerView;
-    private                                        AbstractList<DaySchedule> daySchedules;
+    @InjectView(R.id.activity_shifter_picker_view) CalendarView calendarView;
+
+    private CalendarViewAdapter    adapter;
+    private ArrayList<DaySchedule> daySchedules;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,8 @@ public class ShifterActivity extends ActionBarActivity implements DatePickerCont
         ButterKnife.inject(this);
 
         getSupportLoaderManager().initLoader(DAY_SCHEDULES_LOADER_ID, null, this);
-        dayPickerView.setController(this);
+        adapter = new CalendarViewAdapter(getApplicationContext(), this);
+        calendarView.setAdapter(adapter);
     }
 
     @Override
@@ -74,6 +78,7 @@ public class ShifterActivity extends ActionBarActivity implements DatePickerCont
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         daySchedules = Utils.getDaySchedules(data);
+        adapter.setDaySchedules(daySchedules);
     }
 
     @Override
@@ -81,7 +86,7 @@ public class ShifterActivity extends ActionBarActivity implements DatePickerCont
 
     @Override
     public int getMaxYear() {
-        return 2018;
+        return 2016;
     }
 
     public void onEvent(OnDayClickEvent onDayClickEvent) {
@@ -98,7 +103,9 @@ public class ShifterActivity extends ActionBarActivity implements DatePickerCont
             }
         }
 
-        return new DaySchedule();
+        DaySchedule daySchedule = new DaySchedule();
+        daySchedule.setDate(day.getTimeInMillis());
+        return daySchedule;
     }
 
     @Override

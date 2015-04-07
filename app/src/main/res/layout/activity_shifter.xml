@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".ShifterActivity">
 
-    <com.android.jjnunogarcia.shifter.views.DayPickerView
+    <com.android.jjnunogarcia.shifter.views.CalendarView
         android:id="@+id/activity_shifter_picker_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

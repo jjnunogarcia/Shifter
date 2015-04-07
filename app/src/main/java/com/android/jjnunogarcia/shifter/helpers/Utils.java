@@ -82,7 +82,7 @@ public final class Utils {
         return daySchedule;
     }
 
-    private static ArrayList<DaySchedule> groupDaysAndShifts(ArrayList<DaySchedule> daySchedules) {
+    private static ArrayList<DaySchedule> groupDaysAndShifts(ArrayList<DaySchedule> daySchedules) { // TODO test this
         ArrayList<DaySchedule> groupedDaySchedules = new ArrayList<>();
 
         for (int i = 0, size = daySchedules.size(); i < size; i++) {
@@ -91,11 +91,13 @@ public final class Utils {
             if (!dayScheduleExistsInGroup(groupedDaySchedules, daySchedule)) {
                 DaySchedule groupedDaySchedule = new DaySchedule(daySchedule);
 
-                for (int j = i; j < size; j++) {
-                    DaySchedule dayScheduleToGroup = daySchedules.get(j);
+                if (i + 1 < size) {
+                    for (int j = i + 1; j < size; j++) {
+                        DaySchedule dayScheduleToGroup = daySchedules.get(j);
 
-                    if (daySchedule.getDate() == dayScheduleToGroup.getDate()) {
-                        groupedDaySchedule.getShifts().addAll(dayScheduleToGroup.getShifts());
+                        if (daySchedule.getDate() == dayScheduleToGroup.getDate()) {
+                            groupedDaySchedule.getShifts().addAll(dayScheduleToGroup.getShifts());
+                        }
                     }
                 }
 

@@ -2,8 +2,8 @@ package com.android.jjnunogarcia.shifter.views;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
@@ -17,13 +17,12 @@ import com.android.jjnunogarcia.shifter.R;
 import com.android.jjnunogarcia.shifter.eventbus.OnDayClickEvent;
 import com.android.jjnunogarcia.shifter.helpers.Utils;
 import com.android.jjnunogarcia.shifter.model.CalendarDay;
+import com.android.jjnunogarcia.shifter.model.DaySchedule;
 import de.greenrobot.event.EventBus;
 
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * User: jesus
@@ -41,7 +40,6 @@ public class SimpleMonthView extends View {
     protected static final int DEFAULT_NUM_ROWS = 6;
     protected static int DAY_SELECTED_CIRCLE_SIZE;
     protected static int MINI_DAY_NUMBER_TEXT_SIZE;
-    protected static int MIN_HEIGHT = 10;
     protected static int MONTH_DAY_LABEL_TEXT_SIZE;
     protected static int MONTH_HEADER_SIZE;
     protected static int MONTH_LABEL_TEXT_SIZE;
@@ -67,36 +65,37 @@ public class SimpleMonthView extends View {
 
     protected int rowHeight = DEFAULT_HEIGHT;
     private   int numRows   = DEFAULT_NUM_ROWS;
-    protected       int      month;
-    protected       int      width;
-    protected       int      year;
-    protected final Time     todayTime;
-    private final   Calendar calendar;
-    private final   Calendar weekDayNameCalendar;
+    protected       int                    month;
+    protected       int                    width;
+    protected       int                    year;
+    protected final Time                   todayTime;
+    private final   Calendar               calendar;
+    private final   Calendar               weekDayNameCalendar;
+    private         ArrayList<DaySchedule> daySchedules;
 
-
-    public SimpleMonthView(Context context, TypedArray typedArray) {
+    public SimpleMonthView(Context context) {
         super(context);
 
         Resources resources = context.getResources();
+        daySchedules = new ArrayList<>();
         weekDayNameCalendar = Calendar.getInstance();
         calendar = Calendar.getInstance();
         todayTime = new Time(Time.getCurrentTimezone());
         todayTime.setToNow();
         dayOfWeekTypeface = resources.getString(R.string.sans_serif);
         monthTitleTypeface = resources.getString(R.string.sans_serif);
-        monthTextColor = typedArray.getColor(R.styleable.DayPickerView_colorMonthName, resources.getColor(R.color.normal_day));
-        dayTextColor = typedArray.getColor(R.styleable.DayPickerView_colorDayName, resources.getColor(R.color.normal_day));
-        selectedDaysColor = typedArray.getColor(R.styleable.DayPickerView_colorSelectedDayBackground, resources.getColor(R.color.selected_day_background));
-        monthTitleBGColor = typedArray.getColor(R.styleable.DayPickerView_colorSelectedDayText, resources.getColor(R.color.selected_day_text));
+        monthTextColor = resources.getColor(R.color.normal_day);
+        dayTextColor = resources.getColor(R.color.normal_day);
+        selectedDaysColor = resources.getColor(R.color.selected_day_background);
+        monthTitleBGColor = resources.getColor(R.color.selected_day_text);
 
-        MINI_DAY_NUMBER_TEXT_SIZE = typedArray.getDimensionPixelSize(R.styleable.DayPickerView_textSizeDay, resources.getDimensionPixelSize(R.dimen.text_size_day));
-        MONTH_LABEL_TEXT_SIZE = typedArray.getDimensionPixelSize(R.styleable.DayPickerView_textSizeMonth, resources.getDimensionPixelSize(R.dimen.text_size_month));
-        MONTH_DAY_LABEL_TEXT_SIZE = typedArray.getDimensionPixelSize(R.styleable.DayPickerView_textSizeDayName, resources.getDimensionPixelSize(R.dimen.text_size_day_name));
-        MONTH_HEADER_SIZE = typedArray.getDimensionPixelOffset(R.styleable.DayPickerView_headerMonthHeight, resources.getDimensionPixelOffset(R.dimen.header_month_height));
-        DAY_SELECTED_CIRCLE_SIZE = typedArray.getDimensionPixelSize(R.styleable.DayPickerView_selectedDayRadius, resources.getDimensionPixelOffset(R.dimen.selected_day_radius));
+        MINI_DAY_NUMBER_TEXT_SIZE = resources.getDimensionPixelSize(R.dimen.text_size_day);
+        MONTH_LABEL_TEXT_SIZE = resources.getDimensionPixelSize(R.dimen.text_size_month);
+        MONTH_DAY_LABEL_TEXT_SIZE = resources.getDimensionPixelSize(R.dimen.text_size_day_name);
+        MONTH_HEADER_SIZE = resources.getDimensionPixelOffset(R.dimen.header_month_height);
+        DAY_SELECTED_CIRCLE_SIZE = resources.getDimensionPixelOffset(R.dimen.selected_day_radius);
 
-        rowHeight = (typedArray.getDimensionPixelSize(R.styleable.DayPickerView_calendarHeight, resources.getDimensionPixelOffset(R.dimen.calendar_height)) - MONTH_HEADER_SIZE) / 6;
+        rowHeight = (resources.getDimensionPixelOffset(R.dimen.calendar_height) - MONTH_HEADER_SIZE) / 6;
 
         initView();
     }
@@ -182,6 +181,12 @@ public class SimpleMonthView extends View {
 //            dayView.setText(String.valueOf(day));
 //            dayView.draw(canvas);
             canvas.drawCircle(x, circleY, 50, dayCirclePaint);
+
+            if (checkIfDayHasSchedule(day)) {
+                monthNumPaint.setColor(Color.RED);
+            } else {
+                monthNumPaint.setColor(Color.BLACK);
+            }
             canvas.drawText(String.format("%d", day), x, textY, monthNumPaint);
 
             dayOffset++;
@@ -191,6 +196,18 @@ public class SimpleMonthView extends View {
                 circleY += rowHeight;
             }
         }
+    }
+
+    private boolean checkIfDayHasSchedule(int day) {
+        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+        for (DaySchedule daySchedule : daySchedules) {
+            gregorianCalendar.setTimeInMillis(daySchedule.getDate());
+
+            if (gregorianCalendar.get(GregorianCalendar.DAY_OF_MONTH) == day) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int findDayOffset() {
@@ -239,11 +256,6 @@ public class SimpleMonthView extends View {
         return new CalendarDay(year, month, day);
     }
 
-    public void reuse() {
-        numRows = DEFAULT_NUM_ROWS;
-        requestLayout();
-    }
-
     public void setMonthParams(HashMap<String, Integer> params) {
         if (!params.containsKey(VIEW_PARAMS_MONTH) && !params.containsKey(VIEW_PARAMS_YEAR)) {
             throw new InvalidParameterException("You must specify month and year for this view");
@@ -285,5 +297,10 @@ public class SimpleMonthView extends View {
         int dividend = (offset + numCells) / daysPerWeek;
         int remainder = (offset + numCells) % daysPerWeek;
         return dividend + (remainder > 0 ? 1 : 0);
+    }
+
+    public void setDaySchedules(ArrayList<DaySchedule> daySchedules) {
+        this.daySchedules = daySchedules;
+        invalidate();
     }
 }
