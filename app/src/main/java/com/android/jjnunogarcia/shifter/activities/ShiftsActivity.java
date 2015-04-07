@@ -22,7 +22,7 @@ import com.android.jjnunogarcia.shifter.adapters.ShiftsAdapter;
 import com.android.jjnunogarcia.shifter.database.DBConstants;
 import com.android.jjnunogarcia.shifter.database.ShifterProvider;
 import com.android.jjnunogarcia.shifter.eventbus.ShiftSavedEvent;
-import com.android.jjnunogarcia.shifter.fragments.dialogs.ShiftDialog;
+import com.android.jjnunogarcia.shifter.fragments.dialogs.EditShiftDialog;
 import com.android.jjnunogarcia.shifter.helpers.Utils;
 import com.android.jjnunogarcia.shifter.model.Shift;
 import de.greenrobot.event.EventBus;
@@ -86,7 +86,7 @@ public class ShiftsActivity extends ActionBarActivity implements LoaderManager.L
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.activity_shifts_action_create_shift:
-                ShiftDialog.newInstance().show(getSupportFragmentManager().beginTransaction(), ShiftDialog.TAG);
+                EditShiftDialog.newInstance().show(getSupportFragmentManager().beginTransaction(), EditShiftDialog.TAG);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -100,7 +100,7 @@ public class ShiftsActivity extends ActionBarActivity implements LoaderManager.L
     @OnItemClick(R.id.activity_shifts_shift_list)
     void onShiftClick(int position) {
         Shift shift = adapter.getItem(position);
-        ShiftDialog.newInstance(shift).show(getSupportFragmentManager().beginTransaction(), ShiftDialog.TAG);
+        EditShiftDialog.newInstance(shift).show(getSupportFragmentManager().beginTransaction(), EditShiftDialog.TAG);
     }
 
     @OnItemLongClick(R.id.activity_shifts_shift_list)
@@ -113,7 +113,7 @@ public class ShiftsActivity extends ActionBarActivity implements LoaderManager.L
     @Override
     protected void onResume() {
         super.onResume();
-        EventBus.getDefault().registerSticky(this);
+        EventBus.getDefault().register(this);
     }
 
     @Override

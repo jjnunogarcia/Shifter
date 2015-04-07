@@ -104,7 +104,7 @@ public class ShifterActivity extends ActionBarActivity implements DatePickerCont
     @Override
     protected void onResume() {
         super.onResume();
-        EventBus.getDefault().registerSticky(this);
+        EventBus.getDefault().register(this);
     }
 
     @Override

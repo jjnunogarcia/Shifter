@@ -18,7 +18,7 @@ import java.util.Collection;
  * User: jesus
  * Date: 03/04/15
  *
- * @author j.nuno@klara.com
+ * @author jjnunogarcia@gmail.com
  */
 public class ShiftsAdapter extends BaseAdapter {
     private Context          context;

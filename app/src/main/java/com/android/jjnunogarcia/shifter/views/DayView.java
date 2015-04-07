@@ -13,7 +13,7 @@ import com.android.jjnunogarcia.shifter.R;
  * User: jesus
  * Date: 02/04/15
  *
- * @author j.nuno@klara.com
+ * @author jjnunogarcia@gmail.com
  */
 public class DayView extends View {
 

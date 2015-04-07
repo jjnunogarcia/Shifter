@@ -67,7 +67,7 @@ public final class Utils {
         daySchedule.setDate(cursor.getLong(cursor.getColumnIndex(DayScheduleTable.DATE)));
 
         Shift shift = new Shift();
-        shift.setId(cursor.getInt(cursor.getColumnIndex(ShiftTable._ID)));
+        shift.setId(cursor.getInt(cursor.getColumnIndex(DayScheduleTable.SHIFT_ID)));
         shift.setName(cursor.getString(cursor.getColumnIndex(ShiftTable.NAME)));
         shift.setDescription(cursor.getString(cursor.getColumnIndex(ShiftTable.DESCRIPTION)));
         shift.setStart(cursor.getInt(cursor.getColumnIndex(ShiftTable.START)));

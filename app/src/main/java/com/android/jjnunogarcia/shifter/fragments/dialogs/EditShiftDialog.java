@@ -28,30 +28,30 @@ import de.greenrobot.event.EventBus;
  *
  * @author jjnunogarcia@gmail.com
  */
-public class ShiftDialog extends DialogFragment {
-    public static final String TAG       = ShiftDialog.class.getSimpleName();
-    public static final String KEY_SHIFT = "key_shift";
+public class EditShiftDialog extends DialogFragment {
+    public static final String TAG               = EditShiftDialog.class.getSimpleName();
+    public static final String KEY_SHIFT_TO_EDIT = "key_shift_to_edit";
 
-    @InjectView(R.id.dialog_shift_name)        EditText name;
-    @InjectView(R.id.dialog_shift_description) EditText description;
-    @InjectView(R.id.dialog_shift_start)       EditText start;
-    @InjectView(R.id.dialog_shift_duration)    EditText duration;
-    @InjectView(R.id.dialog_shift_location)    EditText location;
-    @InjectView(R.id.dialog_shift_color)       EditText color;
-    @InjectView(R.id.dialog_shift_save)        Button   saveShift;
+    @InjectView(R.id.dialog_edit_shift_name)        EditText name;
+    @InjectView(R.id.dialog_edit_shift_description) EditText description;
+    @InjectView(R.id.dialog_edit_shift_start)       EditText start;
+    @InjectView(R.id.dialog_edit_shift_duration)    EditText duration;
+    @InjectView(R.id.dialog_edit_shift_location)    EditText location;
+    @InjectView(R.id.dialog_edit_shift_color)       EditText color;
+    @InjectView(R.id.dialog_edit_shift_save)        Button   saveShift;
 
     private Shift shiftToEdit;
 
-    public static ShiftDialog newInstance() {
-        return new ShiftDialog();
+    public static EditShiftDialog newInstance() {
+        return new EditShiftDialog();
     }
 
-    public static ShiftDialog newInstance(Shift shift) {
-        ShiftDialog shiftDialog = new ShiftDialog();
+    public static EditShiftDialog newInstance(Shift shiftToEdit) {
+        EditShiftDialog editShiftDialog = new EditShiftDialog();
         Bundle args = new Bundle();
-        args.putParcelable(KEY_SHIFT, shift);
-        shiftDialog.setArguments(args);
-        return shiftDialog;
+        args.putParcelable(KEY_SHIFT_TO_EDIT, shiftToEdit);
+        editShiftDialog.setArguments(args);
+        return editShiftDialog;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ShiftDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        View view = inflater.inflate(R.layout.dialog_shift, container, false);
+        View view = inflater.inflate(R.layout.dialog_edit_shift, container, false);
         ButterKnife.inject(this, view);
         return view;
     }
@@ -74,8 +74,8 @@ public class ShiftDialog extends DialogFragment {
 
         Bundle args = getArguments();
 
-        if (args != null && args.containsKey(KEY_SHIFT)) {
-            shiftToEdit = args.getParcelable(KEY_SHIFT);
+        if (args != null && args.containsKey(KEY_SHIFT_TO_EDIT)) {
+            shiftToEdit = args.getParcelable(KEY_SHIFT_TO_EDIT);
 
             name.setText(shiftToEdit.getName());
             description.setText(shiftToEdit.getDescription());
@@ -86,7 +86,7 @@ public class ShiftDialog extends DialogFragment {
         }
     }
 
-    @OnClick(R.id.dialog_shift_save)
+    @OnClick(R.id.dialog_edit_shift_save)
     void saveShift() {
         String name = this.name.getText().toString();
         String description = this.description.getText().toString();
@@ -126,7 +126,6 @@ public class ShiftDialog extends DialogFragment {
                 EventBus.getDefault().post(new ShiftSavedEvent(shiftToEdit));
             }
         }
-
 
         dismiss();
     }

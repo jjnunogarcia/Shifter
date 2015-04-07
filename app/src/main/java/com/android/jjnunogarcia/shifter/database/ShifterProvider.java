@@ -49,12 +49,12 @@ public class ShifterProvider extends ContentProvider {
         DAY_SCHEDULES_PROJECTION_MAP.put(DayScheduleTable._ID, DayScheduleTable.FULL_ID);
         DAY_SCHEDULES_PROJECTION_MAP.put(DayScheduleTable.DATE, DayScheduleTable.FULL_DATE);
         DAY_SCHEDULES_PROJECTION_MAP.put(DayScheduleTable.SHIFT_ID, DayScheduleTable.FULL_SHIFT_ID);
-        DAY_SCHEDULES_PROJECTION_MAP.put("shift_name", ShiftTable.FULL_NAME + " AS shift_name");
-        DAY_SCHEDULES_PROJECTION_MAP.put("shift_description", ShiftTable.FULL_DESCRIPTION + " AS shift_description");
-        DAY_SCHEDULES_PROJECTION_MAP.put("shit_start", ShiftTable.FULL_START + " AS shit_start");
-        DAY_SCHEDULES_PROJECTION_MAP.put("shift_duration", ShiftTable.FULL_DURATION + " AS shift_duration");
-        DAY_SCHEDULES_PROJECTION_MAP.put("shift_location", ShiftTable.FULL_LOCATION + " AS shift_location");
-        DAY_SCHEDULES_PROJECTION_MAP.put("shift_color", ShiftTable.FULL_COLOR + " AS shift_color");
+        DAY_SCHEDULES_PROJECTION_MAP.put(ShiftTable.FULL_NAME, ShiftTable.FULL_NAME);
+        DAY_SCHEDULES_PROJECTION_MAP.put(ShiftTable.FULL_DESCRIPTION, ShiftTable.FULL_DESCRIPTION);
+        DAY_SCHEDULES_PROJECTION_MAP.put(ShiftTable.FULL_START, ShiftTable.FULL_START);
+        DAY_SCHEDULES_PROJECTION_MAP.put(ShiftTable.FULL_DURATION, ShiftTable.FULL_DURATION);
+        DAY_SCHEDULES_PROJECTION_MAP.put(ShiftTable.FULL_LOCATION, ShiftTable.FULL_LOCATION);
+        DAY_SCHEDULES_PROJECTION_MAP.put(ShiftTable.FULL_COLOR, ShiftTable.FULL_COLOR);
     }
 
     private SQLiteDatabase db;
@@ -90,7 +90,16 @@ public class ShifterProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        // TODO
+        switch (uriMatcher.match(uri)) {
+            case DBConstants.SHIFTS_TABLE_CODE:
+//                return Items.CONTENT_TYPE;
+            case DBConstants.DAY_SCHEDULES_TABLE_CODE:
+//                return Items.CONTENT_ITEM_TYPE;
+            default:
+                return null;
+        }
+
     }
 
     @Override

@@ -30,12 +30,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + ShiftTable.TABLENAME);
         db.execSQL("DROP TABLE IF EXISTS " + DayScheduleTable.TABLENAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + DBConstants.PATTERNS_TABLE_NAME);
+//        db.execSQL("DROP TABLE IF EXISTS " + PatternTable.TABLENAME);
         onCreate(db);
     }
 
     private void createTables(SQLiteDatabase db) {
-        // TODO it's necessary to create two tables: one for all the different shift types and the other to store which shifts are in which days (and other for patterns)
+        // Table for all the different shift types
         db.execSQL("CREATE TABLE " + ShiftTable.TABLENAME + "(" +
                    ShiftTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                    ShiftTable.NAME + " TEXT, " +
@@ -44,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                    ShiftTable.DURATION + " INTEGER, " +
                    ShiftTable.LOCATION + " TEXT, " +
                    ShiftTable.COLOR + " INTEGER);");
+        // Table fto store which shifts are in which days
         db.execSQL("CREATE TABLE " + DayScheduleTable.TABLENAME + "(" +
                    DayScheduleTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                    DayScheduleTable.DATE + " LONG, " +

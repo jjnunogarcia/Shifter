@@ -28,7 +28,13 @@ public final class DBConstants {
     public static final String[] DAY_SCHEDULES_PROJECTION     = {
             DayScheduleTable._ID,
             DayScheduleTable.DATE,
-            DayScheduleTable.SHIFT_ID
+            DayScheduleTable.SHIFT_ID,
+            ShiftTable.FULL_NAME,
+            ShiftTable.FULL_DESCRIPTION,
+            ShiftTable.FULL_START,
+            ShiftTable.FULL_DURATION,
+            ShiftTable.FULL_LOCATION,
+            ShiftTable.FULL_COLOR
     };
     public static final String   SORT_DAY_SCHEDULES_BY_ID_ASC = DayScheduleTable.FULL_ID + " COLLATE NOCASE ASC";
 //    public static final String   PATTERNS_TABLE_NAME          = "patterns";

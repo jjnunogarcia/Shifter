@@ -5,50 +5,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <CheckBox
+        android:id="@+id/select_shift_row_check_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <TextView
-        android:id="@+id/day_detail_shift_row_id"
+        android:id="@+id/select_shift_row_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         tools:text="1" />
 
     <TextView
-        android:id="@+id/day_detail_shift_row_name"
+        android:id="@+id/select_shift_row_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         tools:text="Name" />
 
     <TextView
-        android:id="@+id/day_detail_shift_row_description"
+        android:id="@+id/select_shift_row_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         tools:text="Description" />
 
     <TextView
-        android:id="@+id/day_detail_shift_row_start"
+        android:id="@+id/select_shift_row_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         tools:text="9:00" />
 
     <TextView
-        android:id="@+id/day_detail_shift_row_duration"
+        android:id="@+id/select_shift_row_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         tools:text="3h" />
 
     <TextView
-        android:id="@+id/day_detail_shift_row_location"
+        android:id="@+id/select_shift_row_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         tools:text="Hospital" />
 
     <TextView
-        android:id="@+id/day_detail_shift_row_color"
+        android:id="@+id/select_shift_row_color"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"

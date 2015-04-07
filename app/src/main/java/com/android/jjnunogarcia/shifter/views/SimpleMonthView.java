@@ -175,7 +175,7 @@ public class SimpleMonthView extends View {
         int dayWidthHalf = (width - 2 * padding) / (2 * daysPerWeek);
         int dayOffset = findDayOffset();
 
-        for (int day = 1; day < numCells; day++) {
+        for (int day = 1; day <= numCells; day++) {
             int x = dayWidthHalf * (1 + dayOffset * 2) + padding;
 
 //            DayView dayView = new DayView(getContext());
