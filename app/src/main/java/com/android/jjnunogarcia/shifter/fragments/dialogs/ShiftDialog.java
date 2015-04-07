@@ -29,7 +29,8 @@ import de.greenrobot.event.EventBus;
  * @author jjnunogarcia@gmail.com
  */
 public class ShiftDialog extends DialogFragment {
-    public static final String TAG = ShiftDialog.class.getSimpleName();
+    public static final String TAG       = ShiftDialog.class.getSimpleName();
+    public static final String KEY_SHIFT = "key_shift";
 
     @InjectView(R.id.dialog_shift_name)        EditText name;
     @InjectView(R.id.dialog_shift_description) EditText description;
@@ -39,8 +40,24 @@ public class ShiftDialog extends DialogFragment {
     @InjectView(R.id.dialog_shift_color)       EditText color;
     @InjectView(R.id.dialog_shift_save)        Button   saveShift;
 
+    private Shift shiftToEdit;
+
     public static ShiftDialog newInstance() {
         return new ShiftDialog();
+    }
+
+    public static ShiftDialog newInstance(Shift shift) {
+        ShiftDialog shiftDialog = new ShiftDialog();
+        Bundle args = new Bundle();
+        args.putParcelable(KEY_SHIFT, shift);
+        shiftDialog.setArguments(args);
+        return shiftDialog;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        shiftToEdit = new Shift();
     }
 
     @Override
@@ -54,24 +71,29 @@ public class ShiftDialog extends DialogFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        Bundle args = getArguments();
+
+        if (args != null && args.containsKey(KEY_SHIFT)) {
+            shiftToEdit = args.getParcelable(KEY_SHIFT);
+
+            name.setText(shiftToEdit.getName());
+            description.setText(shiftToEdit.getDescription());
+            start.setText(String.valueOf(shiftToEdit.getStart()));
+            duration.setText(String.valueOf(shiftToEdit.getDuration()));
+            location.setText(shiftToEdit.getLocation());
+            color.setText(String.valueOf(shiftToEdit.getColor()));
+        }
     }
 
     @OnClick(R.id.dialog_shift_save)
     void saveShift() {
-        Shift shift = new Shift();
         String name = this.name.getText().toString();
         String description = this.description.getText().toString();
         int start = Integer.parseInt(this.start.getText().toString());
         int duration = Integer.parseInt(this.duration.getText().toString());
         String location = this.location.getText().toString();
         int color = Integer.parseInt(this.color.getText().toString());
-
-        shift.setName(name);
-        shift.setDescription(description);
-        shift.setStart(start);
-        shift.setDuration(duration);
-        shift.setLocation(location);
-        shift.setColor(color);
 
         ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
         ContentValues contentValues = new ContentValues();
@@ -83,10 +105,28 @@ public class ShiftDialog extends DialogFragment {
         contentValues.put(ShiftTable.COLOR, color);
         Uri uriInserted = contentResolver.insert(ShifterProvider.SHIFTS_URI, contentValues);
 
-        if (uriInserted != null) { // success
-            shift.setId(Integer.valueOf(uriInserted.getLastPathSegment())); // set the id of the task according to where it is inserted
-            EventBus.getDefault().post(new ShiftSavedEvent(shift));
+        shiftToEdit.setName(name);
+        shiftToEdit.setDescription(description);
+        shiftToEdit.setStart(start);
+        shiftToEdit.setDuration(duration);
+        shiftToEdit.setLocation(location);
+        shiftToEdit.setColor(color);
+
+        if (shiftToEdit.getId() == Shift.NO_ID) { // new shift to insert
+            if (uriInserted != null) { // success
+                shiftToEdit.setId(Integer.valueOf(uriInserted.getLastPathSegment())); // set the id of the task according to where it is inserted
+                EventBus.getDefault().post(new ShiftSavedEvent(shiftToEdit));
+            }
+        } else { // shift to update
+            String where = ShiftTable._ID + "=?";
+            String[] selectionArgs = {String.valueOf(shiftToEdit.getId())};
+            int rowsUpdated = contentResolver.update(ShifterProvider.SHIFTS_URI, contentValues, where, selectionArgs);
+
+            if (rowsUpdated > 0) { // success
+                EventBus.getDefault().post(new ShiftSavedEvent(shiftToEdit));
+            }
         }
+
 
         dismiss();
     }

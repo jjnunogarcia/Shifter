@@ -67,6 +67,29 @@ public class DaySchedule implements Parcelable {
         source.readTypedList(shifts, Shift.CREATOR);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DaySchedule that = (DaySchedule) o;
+
+        if (id != that.id) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
     public int getId() {
         return id;
     }

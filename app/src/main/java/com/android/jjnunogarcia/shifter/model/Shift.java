@@ -10,6 +10,8 @@ import android.os.Parcelable;
  * @author jjnunogarcia@gmail.com
  */
 public class Shift implements Parcelable {
+    public static final int NO_ID = -1;
+
     private int    id;
     private String name;
     private String description;
@@ -35,7 +37,9 @@ public class Shift implements Parcelable {
         };
     }
 
-    public Shift() {}
+    public Shift() {
+        id = NO_ID;
+    }
 
     private Shift(Parcel source) {
         this();
@@ -66,6 +70,29 @@ public class Shift implements Parcelable {
         duration = source.readInt();
         location = source.readString();
         color = source.readInt();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Shift shift = (Shift) o;
+
+        if (id != shift.id) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 
     public int getId() {

@@ -34,8 +34,13 @@ public class ShiftsAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void addContent(Shift shift) {
-        this.shifts.add(shift);
+    public void addOrReplaceContent(Shift shift) {
+        if (shifts.contains(shift)) {
+            int positionToReplace = shifts.indexOf(shift);
+            shifts.set(positionToReplace, shift);
+        } else {
+            shifts.add(shift);
+        }
         notifyDataSetChanged();
     }
 
@@ -73,13 +78,13 @@ public class ShiftsAdapter extends BaseAdapter {
         }
 
         Shift shift = shifts.get(position);
-        shiftViewHolder.id.setText(shift.getId());
+        shiftViewHolder.id.setText(String.valueOf(shift.getId()));
         shiftViewHolder.name.setText(shift.getName());
         shiftViewHolder.description.setText(shift.getDescription());
-        shiftViewHolder.start.setText(shift.getStart());
-        shiftViewHolder.duration.setText(shift.getDuration());
+        shiftViewHolder.start.setText(String.valueOf(shift.getStart()));
+        shiftViewHolder.duration.setText(String.valueOf(shift.getDuration()));
         shiftViewHolder.location.setText(shift.getLocation());
-        shiftViewHolder.color.setText(shift.getColor());
+        shiftViewHolder.color.setText(String.valueOf(shift.getColor()));
 
         return view;
     }

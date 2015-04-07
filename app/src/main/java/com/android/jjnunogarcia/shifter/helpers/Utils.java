@@ -8,6 +8,7 @@ import com.android.jjnunogarcia.shifter.model.Shift;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * User: jesus
@@ -17,25 +18,8 @@ import java.util.Calendar;
  */
 public final class Utils {
     public static int getDaysInMonth(int month, int year) {
-        switch (month) {
-            case Calendar.JANUARY:
-            case Calendar.MARCH:
-            case Calendar.MAY:
-            case Calendar.JULY:
-            case Calendar.AUGUST:
-            case Calendar.OCTOBER:
-            case Calendar.DECEMBER:
-                return 31;
-            case Calendar.APRIL:
-            case Calendar.JUNE:
-            case Calendar.SEPTEMBER:
-            case Calendar.NOVEMBER:
-                return 30;
-            case Calendar.FEBRUARY:
-                return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) ? 29 : 28;
-            default:
-                throw new IllegalArgumentException("Invalid Month");
-        }
+        Calendar calendar = new GregorianCalendar(year, month, 1);
+        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
     public static ArrayList<Shift> getShifts(Cursor cursor) {
@@ -130,5 +114,10 @@ public final class Utils {
         }
 
         return false;
+    }
+
+    public static boolean isNumber(String string) {
+        String regex = "[0-9]+";
+        return string.matches(regex);
     }
 }

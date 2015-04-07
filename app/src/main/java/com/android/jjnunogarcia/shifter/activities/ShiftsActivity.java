@@ -12,8 +12,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnItemClick;
+import butterknife.OnItemLongClick;
 import com.android.jjnunogarcia.shifter.R;
 import com.android.jjnunogarcia.shifter.adapters.ShiftsAdapter;
 import com.android.jjnunogarcia.shifter.database.DBConstants;
@@ -91,7 +94,20 @@ public class ShiftsActivity extends ActionBarActivity implements LoaderManager.L
     }
 
     public void onEvent(ShiftSavedEvent shiftSavedEvent) {
-        adapter.addContent(shiftSavedEvent.getShift());
+        adapter.addOrReplaceContent(shiftSavedEvent.getShift());
+    }
+
+    @OnItemClick(R.id.activity_shifts_shift_list)
+    void onShiftClick(int position) {
+        Shift shift = adapter.getItem(position);
+        ShiftDialog.newInstance(shift).show(getSupportFragmentManager().beginTransaction(), ShiftDialog.TAG);
+    }
+
+    @OnItemLongClick(R.id.activity_shifts_shift_list)
+    boolean onShiftLongClick(int position) {
+        // TODO
+        Toast.makeText(getApplicationContext(), "Show long click menu", Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     @Override
